@@ -88,24 +88,16 @@ void PlayScene::Update( float deltaTime )
 void PlayScene::Draw()
 {
 	// îwåi
-	DrawBox( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(0, 191, 255), TRUE); // ãÛ
-	DrawBox( 0, GROUND_Y, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(34, 139, 34), TRUE); // ínñ 
+	DrawBackground();
 
 	// îLï`âÊ
-	// DrawCircle( (int)player.x, (int)player.y, CHARACTER_SIZE/2, GetColor( 255, 255, 0 ), TRUE);
-	DrawExtendGraph( (int)(player.x - CHARACTER_SIZE / 2 ), (int)(player.y - CHARACTER_SIZE / 2 ), (int)(player.x + CHARACTER_SIZE / 2 )+1, (int)(player.y + CHARACTER_SIZE / 2 )+1, playerImage, TRUE );
+	DrawPlayer(playerImage);
 
 	// é÷ÇΩÇøï`âÊ
-	for( auto& enemy : enemies )
-	{
-		// DrawCircle( (int)enemy.x, (int)enemy.y, CHARACTER_SIZE/2, GetColor( 0, 0, 255 ), TRUE);
-		DrawExtendGraph( (int)(enemy.x - CHARACTER_SIZE / 2 ), (int)(enemy.y - CHARACTER_SIZE / 2 ), (int)(enemy.x + CHARACTER_SIZE / 2 )+1, (int)(enemy.y + CHARACTER_SIZE / 2 )+1, enemyImage, TRUE );
-	}
+	DrawEnemies(enemyImage);
 
 	// ÉXÉRÉAï\é¶
-	//DrawFormatString( 420, 50, GetColor( 255, 255, 255 ), "%.3f", score );
-	int scoreWidth = GetDrawFormatStringWidthToHandle( scoreFont, "%.3f", score );
-	DrawFormatStringToHandle( WINDOW_WIDTH - scoreWidth, 30, GetColor( 255, 255, 255 ), scoreFont, "%.3f", score );
+	DrawScore();
 }
 
 // ìGÇÃê∂ê¨
@@ -117,6 +109,54 @@ void PlayScene::CreateEnemy()
 	enemy.y = -CHARACTER_SIZE;
 	enemies.push_back(enemy);
 }
+
+void PlayScene::DrawPlayer(int is_draw_collider)
+{
+	if (is_draw_collider <= 0) return; // ï`âÊÇµÇ»Ç¢
+	// ÉvÉåÉCÉÑÅ[ÇÃìñÇΩÇËîªíËÇï`âÊ
+	if (is_draw_collider == 2)
+	{
+		DrawCircle((int)player.x, (int)player.y, CHARACTER_SIZE / 2, GetColor(255, 0, 0), TRUE);
+		return;
+	}
+	// ÉvÉåÉCÉÑÅ[ÇÃâÊëúÇï`âÊ
+	DrawExtendGraph((int)(player.x - CHARACTER_SIZE / 2), (int)(player.y - CHARACTER_SIZE / 2), 
+		(int)(player.x + CHARACTER_SIZE / 2) + 1, (int)(player.y + CHARACTER_SIZE / 2) + 1,
+		playerImage, TRUE);
+}
+
+void PlayScene::DrawEnemies(int is_draw_collider)
+{
+	if (is_draw_collider <= 0) return; // ï`âÊÇµÇ»Ç¢
+	for (auto& enemy : enemies)
+	{
+		// ìGÇÃìñÇΩÇËîªíËÇï`âÊ
+		if (is_draw_collider == 2)
+		{
+			DrawCircle((int)enemy.x, (int)enemy.y, CHARACTER_SIZE / 2, GetColor(0, 0, 255), TRUE);
+			continue;
+		}
+		// ìGÇÃâÊëúÇï`âÊ
+		DrawExtendGraph((int)(enemy.x - CHARACTER_SIZE / 2), (int)(enemy.y - CHARACTER_SIZE / 2),
+			(int)(enemy.x + CHARACTER_SIZE / 2) + 1, (int)(enemy.y + CHARACTER_SIZE / 2) + 1,
+			enemyImage, TRUE);
+	}
+}
+
+void PlayScene::DrawBackground()
+{
+	// îwåiÇï`âÊ
+	DrawBox(0, 0, WINDOW_WIDTH, GROUND_Y, GetColor(0, 191, 255), TRUE); // ãÛ
+	DrawBox(0, GROUND_Y, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(34, 139, 34), TRUE); // ínñ 
+}
+
+void PlayScene::DrawScore()
+{
+	// ÉXÉRÉAÇï`âÊ
+	int scoreWidth = GetDrawFormatStringWidthToHandle(scoreFont, "%.3f", score);
+	DrawFormatStringToHandle(WINDOW_WIDTH - scoreWidth, 30, GetColor(255, 255, 255), scoreFont, "%.3f", score);
+}
+
 
 // ìñÇΩÇËîªíË
 bool PlayScene::IsHit( )
