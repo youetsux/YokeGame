@@ -20,10 +20,12 @@ public:
 	void CreateEnemy();
 	//•\¦—pŠÖ”
 	// is_draw_collider: 0<=•`‰æ‚µ‚È‚¢, 1=•`‰æ‚·‚é 2=“–‚½‚è”»’è‚Ì‚İ•`‰æ‚·‚é
- 	void DrawPlayer(int is_draw_collider);
-	void DrawEnemies(int is_draw_collider);
+ 	void DrawPlayer(int handle, bool is_draw_collider);
+	void DrawEnemies(int handle, bool is_draw_collider);
 	void DrawBackground();
 	void DrawScore();
+	void GoToResultScene() { isFinished = true; }
+	void ClearEnemies() { enemies.clear(); }
 private:
 	Position player;
 	float playerSpeed;
