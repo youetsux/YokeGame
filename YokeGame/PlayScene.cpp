@@ -122,7 +122,7 @@ void PlayScene::CreateEnemy()
 
 void PlayScene::DrawPlayer(int handle, bool is_draw_collider)
 {
-	if (is_draw_collider <= 0) return; // •`‰æ‚µ‚È‚¢
+	if (handle <= 0) return; // •`‰æ‚µ‚È‚¢
 	// ƒvƒŒƒCƒ„[‚Ì“–‚½‚è”»’è‚ð•`‰æ
 	if (is_draw_collider)
 	{
@@ -139,7 +139,7 @@ void PlayScene::DrawPlayer(int handle, bool is_draw_collider)
 
 void PlayScene::DrawEnemies(int handle, bool is_draw_collider)
 {
-	if (is_draw_collider <= 0) return; // •`‰æ‚µ‚È‚¢
+	if (handle <= 0) return; // •`‰æ‚µ‚È‚¢
 	for (auto& enemy : enemies)
 	{
 		// “G‚Ì“–‚½‚è”»’è‚ð•`‰æ
