@@ -3,6 +3,8 @@
 #include "Global.h"
 #include "PlayScene.h"
 
+
+
 int PlayScene:: playerImage = -1;
 int PlayScene:: enemyImage = -1;
 int PlayScene:: scoreFont = -1;
@@ -18,9 +20,11 @@ void PlayScene::Init()
 {
 	player.x = WINDOW_WIDTH / 2;
 	player.y = GROUND_Y-CHARACTER_SIZE/2;
-	playerSpeed = 150.0f;
+	//課題02 プレイヤーの移動速度を設定
+	playerSpeed = 0.0f;
 
-	enemySpeed = 150.0f;
+	//課題03 敵の落下速度を設定
+	enemySpeed = 0.0f;
 	enemySpawnInterval = 0.5f;
 	enemySpawnTimer = 0.0f;
 
@@ -29,9 +33,11 @@ void PlayScene::Init()
 	enemies.clear();
 
 	if( playerImage == -1 )
-		playerImage = LoadGraph( "image/cat.png" );
+		//#課題01 LoadGraph関数を使って画像を読み込む
+		playerImage = LoadGraph( "image/XXX.png" );
 	if( enemyImage == -1 )
-		enemyImage = LoadGraph( "image/snake.png" );
+		//#課題01 LoadGraph関数を使って画像を読み込む
+		enemyImage = LoadGraph( "image/XXXX.png" );
 	if( scoreFont == -1 )
 		scoreFont = CreateFontToHandle( "メイリオ", 64, 0, DX_FONTTYPE_NORMAL );
 
@@ -49,8 +55,9 @@ void PlayScene::Update( float deltaTime )
 		player.x += playerSpeed * deltaTime;
 	}
 
-	// 一定時間後、敵生成
-	enemySpawnTimer += deltaTime;
+	//課題04 敵の生成タイマーを加算
+	enemySpawnTimer;
+
 	if( enemySpawnTimer > enemySpawnInterval )
 	{
 		CreateEnemy();
@@ -75,14 +82,16 @@ void PlayScene::Update( float deltaTime )
 		}
 	}
 
-	// 当たり判定
-	if( IsHit() )
+	//課題06 当たり判定
+	if( 0 )
 	{
-		isFinished = true;
+		ClearEnemies();
+		//課題07 リザルト画面へ移行
+		//->ここに移行処理を追加
 	}
 
-	// スコア加算
-	score += deltaTime;
+	//課題05 スコアの値を更新
+	score;
 }
 
 void PlayScene::Draw()
@@ -91,10 +100,10 @@ void PlayScene::Draw()
 	DrawBackground();
 
 	// 猫描画
-	DrawPlayer(playerImage);
+	DrawPlayer(playerImage, false);
 
 	// 蛇たち描画
-	DrawEnemies(enemyImage);
+	DrawEnemies(enemyImage, false);
 
 	// スコア表示
 	DrawScore();
@@ -110,36 +119,41 @@ void PlayScene::CreateEnemy()
 	enemies.push_back(enemy);
 }
 
-void PlayScene::DrawPlayer(int is_draw_collider)
+
+void PlayScene::DrawPlayer(int handle, bool is_draw_collider)
 {
 	if (is_draw_collider <= 0) return; // 描画しない
 	// プレイヤーの当たり判定を描画
-	if (is_draw_collider == 2)
+	if (is_draw_collider)
 	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128); // 半透明に設定
 		DrawCircle((int)player.x, (int)player.y, CHARACTER_SIZE / 2, GetColor(255, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
 		return;
 	}
 	// プレイヤーの画像を描画
-	DrawExtendGraph((int)(player.x - CHARACTER_SIZE / 2), (int)(player.y - CHARACTER_SIZE / 2), 
+	DrawExtendGraph((int)(player.x - CHARACTER_SIZE / 2), (int)(player.y - CHARACTER_SIZE / 2),
 		(int)(player.x + CHARACTER_SIZE / 2) + 1, (int)(player.y + CHARACTER_SIZE / 2) + 1,
-		playerImage, TRUE);
+		handle, TRUE);
 }
 
-void PlayScene::DrawEnemies(int is_draw_collider)
+void PlayScene::DrawEnemies(int handle, bool is_draw_collider)
 {
 	if (is_draw_collider <= 0) return; // 描画しない
 	for (auto& enemy : enemies)
 	{
 		// 敵の当たり判定を描画
-		if (is_draw_collider == 2)
+		if (is_draw_collider)
 		{
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128); // 半透明に設定
 			DrawCircle((int)enemy.x, (int)enemy.y, CHARACTER_SIZE / 2, GetColor(0, 0, 255), TRUE);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
 			continue;
 		}
 		// 敵の画像を描画
 		DrawExtendGraph((int)(enemy.x - CHARACTER_SIZE / 2), (int)(enemy.y - CHARACTER_SIZE / 2),
 			(int)(enemy.x + CHARACTER_SIZE / 2) + 1, (int)(enemy.y + CHARACTER_SIZE / 2) + 1,
-			enemyImage, TRUE);
+			handle, TRUE);
 	}
 }
 
