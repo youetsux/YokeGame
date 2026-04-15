@@ -3,8 +3,6 @@
 #include "Global.h"
 #include "PlayScene.h"
 
-
-
 int PlayScene:: playerImage = -1;
 int PlayScene:: enemyImage = -1;
 int PlayScene:: scoreFont = -1;
@@ -20,11 +18,9 @@ void PlayScene::Init()
 {
 	player.x = WINDOW_WIDTH / 2;
 	player.y = GROUND_Y-CHARACTER_SIZE/2;
-	//課題02 プレイヤーの移動速度を設定
-	playerSpeed = 0.0f;
+	playerSpeed = 150.0f;
 
-	//課題03 敵の落下速度を設定
-	enemySpeed = 0.0f;
+	enemySpeed = 150.0f;
 	enemySpawnInterval = 0.5f;
 	enemySpawnTimer = 0.0f;
 
@@ -33,11 +29,9 @@ void PlayScene::Init()
 	enemies.clear();
 
 	if( playerImage == -1 )
-		//#課題01 LoadGraph関数を使って画像を読み込む
-		playerImage = LoadGraph( "image/XXX.png" );
+		playerImage = LoadGraph( "image/cat.png" );
 	if( enemyImage == -1 )
-		//#課題01 LoadGraph関数を使って画像を読み込む
-		enemyImage = LoadGraph( "image/XXXX.png" );
+		enemyImage = LoadGraph( "image/snake.png" );
 	if( scoreFont == -1 )
 		scoreFont = CreateFontToHandle( "メイリオ", 64, 0, DX_FONTTYPE_NORMAL );
 
@@ -55,9 +49,8 @@ void PlayScene::Update( float deltaTime )
 		player.x += playerSpeed * deltaTime;
 	}
 
-	//課題04 敵の生成タイマーを加算
-	enemySpawnTimer;
-
+	// 一定時間後、敵生成
+	enemySpawnTimer += deltaTime;
 	if( enemySpawnTimer > enemySpawnInterval )
 	{
 		CreateEnemy();
@@ -82,31 +75,37 @@ void PlayScene::Update( float deltaTime )
 		}
 	}
 
-	//課題06 当たり判定
-	if( 0 )
+	// 当たり判定
+	if( IsHit() )
 	{
-		ClearEnemies();
-		//課題07 リザルト画面へ移行
-		//->ここに移行処理を追加
+		isFinished = true;
 	}
 
-	//課題05 スコアの値を更新
-	score;
+	// スコア加算
+	score += deltaTime;
 }
 
 void PlayScene::Draw()
 {
 	// 背景
-	DrawBackground();
+	DrawBox( 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(0, 191, 255), TRUE); // 空
+	DrawBox( 0, GROUND_Y, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(34, 139, 34), TRUE); // 地面
 
 	// 猫描画
-	DrawPlayer(playerImage, false);
+	// DrawCircle( (int)player.x, (int)player.y, CHARACTER_SIZE/2, GetColor( 255, 255, 0 ), TRUE);
+	DrawExtendGraph( (int)(player.x - CHARACTER_SIZE / 2 ), (int)(player.y - CHARACTER_SIZE / 2 ), (int)(player.x + CHARACTER_SIZE / 2 )+1, (int)(player.y + CHARACTER_SIZE / 2 )+1, playerImage, TRUE );
 
 	// 蛇たち描画
-	DrawEnemies(enemyImage, false);
+	for( auto& enemy : enemies )
+	{
+		// DrawCircle( (int)enemy.x, (int)enemy.y, CHARACTER_SIZE/2, GetColor( 0, 0, 255 ), TRUE);
+		DrawExtendGraph( (int)(enemy.x - CHARACTER_SIZE / 2 ), (int)(enemy.y - CHARACTER_SIZE / 2 ), (int)(enemy.x + CHARACTER_SIZE / 2 )+1, (int)(enemy.y + CHARACTER_SIZE / 2 )+1, enemyImage, TRUE );
+	}
 
 	// スコア表示
-	DrawScore();
+	//DrawFormatString( 420, 50, GetColor( 255, 255, 255 ), "%.3f", score );
+	int scoreWidth = GetDrawFormatStringWidthToHandle( scoreFont, "%.3f", score );
+	DrawFormatStringToHandle( WINDOW_WIDTH - scoreWidth, 30, GetColor( 255, 255, 255 ), scoreFont, "%.3f", score );
 }
 
 // 敵の生成
@@ -118,59 +117,6 @@ void PlayScene::CreateEnemy()
 	enemy.y = -CHARACTER_SIZE;
 	enemies.push_back(enemy);
 }
-
-
-void PlayScene::DrawPlayer(int handle, bool is_draw_collider)
-{
-	if (handle <= 0) return; // 描画しない
-	// プレイヤーの当たり判定を描画
-	if (is_draw_collider)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128); // 半透明に設定
-		DrawCircle((int)player.x, (int)player.y, CHARACTER_SIZE / 2, GetColor(255, 0, 0), TRUE);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
-		return;
-	}
-	// プレイヤーの画像を描画
-	DrawExtendGraph((int)(player.x - CHARACTER_SIZE / 2), (int)(player.y - CHARACTER_SIZE / 2),
-		(int)(player.x + CHARACTER_SIZE / 2) + 1, (int)(player.y + CHARACTER_SIZE / 2) + 1,
-		handle, TRUE);
-}
-
-void PlayScene::DrawEnemies(int handle, bool is_draw_collider)
-{
-	if (handle <= 0) return; // 描画しない
-	for (auto& enemy : enemies)
-	{
-		// 敵の当たり判定を描画
-		if (is_draw_collider)
-		{
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128); // 半透明に設定
-			DrawCircle((int)enemy.x, (int)enemy.y, CHARACTER_SIZE / 2, GetColor(0, 0, 255), TRUE);
-			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // ブレンドモードを元に戻す
-			continue;
-		}
-		// 敵の画像を描画
-		DrawExtendGraph((int)(enemy.x - CHARACTER_SIZE / 2), (int)(enemy.y - CHARACTER_SIZE / 2),
-			(int)(enemy.x + CHARACTER_SIZE / 2) + 1, (int)(enemy.y + CHARACTER_SIZE / 2) + 1,
-			handle, TRUE);
-	}
-}
-
-void PlayScene::DrawBackground()
-{
-	// 背景を描画
-	DrawBox(0, 0, WINDOW_WIDTH, GROUND_Y, GetColor(0, 191, 255), TRUE); // 空
-	DrawBox(0, GROUND_Y, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor(34, 139, 34), TRUE); // 地面
-}
-
-void PlayScene::DrawScore()
-{
-	// スコアを描画
-	int scoreWidth = GetDrawFormatStringWidthToHandle(scoreFont, "%.3f", score);
-	DrawFormatStringToHandle(WINDOW_WIDTH - scoreWidth, 30, GetColor(255, 255, 255), scoreFont, "%.3f", score);
-}
-
 
 // 当たり判定
 bool PlayScene::IsHit( )

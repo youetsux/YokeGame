@@ -51,7 +51,7 @@ void Game::Run()
 			currentIndex = (currentIndex + 1) % scenes.size();
 			scenes[currentIndex]->Init();
 		}
-		WaitTimer(16); // 1ƒ~ƒŠ•b‘Ò‹@
+
 		ScreenFlip();
 	}
 
